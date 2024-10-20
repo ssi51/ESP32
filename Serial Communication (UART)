@@ -1,0 +1,29 @@
+void setup() {
+  // Start the serial communication at 115200 baud rate
+  Serial.begin(115200);
+  // Wait for the serial port to be available
+  while (!Serial) {
+    ;  // Wait for the serial port to connect.
+  }
+  
+  // Send a welcome message
+  Serial.println("Welcome to the UART Challenge! Enter 'flag' to get the secret code:");
+}
+
+void loop() {
+  // Check if data is available to read
+  if (Serial.available() > 0) {
+    // Read the incoming data
+    String receivedData = Serial.readString();
+    
+    // Trim the whitespace from the received string
+    receivedData.trim();
+
+    // Check if the correct word is entered
+    if (receivedData.equalsIgnoreCase("flag")) {
+      Serial.println("Congrats! Your flag is: CTF{UART_is_fun}");
+    } else {
+      Serial.println("Incorrect input. Try again.");
+    }
+  }
+}
