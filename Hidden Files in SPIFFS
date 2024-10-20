@@ -1,0 +1,59 @@
+#include "FS.h"
+#include "SPIFFS.h"
+
+void setup() {
+  // Start serial communication at 115200 baud rate
+  Serial.begin(115200);
+  while (!Serial) {
+    ; // Wait for serial port to connect
+  }
+
+  // Initialize SPIFFS
+  if (!SPIFFS.begin(true)) {
+    Serial.println("SPIFFS Mount Failed");
+    return;
+  }
+
+  // Check if the file already exists
+  if (!SPIFFS.exists("/flag.txt")) {
+    // Write the flag to a file
+    File file = SPIFFS.open("/flag.txt", FILE_WRITE);
+    if (!file) {
+      Serial.println("Failed to open file for writing");
+      return;
+    }
+    file.println("Congrats! Your flag is: CTF{SPIFFS_is_awesome}");
+    file.close();
+    Serial.println("Flag file written to SPIFFS");
+  } else {
+    Serial.println("Flag file already exists in SPIFFS");
+  }
+
+  // Provide instructions to the user
+  Serial.println("Type 'readflag' to retrieve the hidden flag.");
+}
+
+void loop() {
+  // Check for serial input
+  if (Serial.available() > 0) {
+    String command = Serial.readString();
+    command.trim();  // Remove any extraneous white space
+    
+    if (command.equalsIgnoreCase("readflag")) {
+      // Read the hidden flag from SPIFFS
+      File file = SPIFFS.open("/flag.txt", FILE_READ);
+      if (!file) {
+        Serial.println("Failed to open file for reading");
+        return;
+      }
+
+      // Print out the contents of the file
+      while (file.available()) {
+        Serial.write(file.read());
+      }
+      file.close();
+    } else {
+      Serial.println("Invalid command. Type 'readflag' to get the flag.");
+    }
+  }
+}
